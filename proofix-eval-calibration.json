@@ -1,6 +1,6 @@
 {
   "kind": "local_fixture_calibration_not_live_agent_result",
-  "repository": "/Users/chelvachezhiyan/Projects/ProoFix/samples/proofix-eval-repo",
+  "repository": "/Users/chelvachezhiyan/Projects/samples",
   "full_original_suite": {
     "outcome": "behavioral_assertion_failed",
     "exit_code": 1,

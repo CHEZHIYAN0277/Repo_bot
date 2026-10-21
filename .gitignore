@@ -1,0 +1,4 @@
+/proofix-eval-repo/
+__pycache__/
+.pytest_cache/
+.json-report.json

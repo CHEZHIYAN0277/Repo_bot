@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE / "proofix-eval-repo"
+REPO = HERE
 CASES = json.loads((HERE / "proofix-eval-cases.json").read_text(encoding="utf-8"))["issues"]
 
 # Reviewed source replacements are deliberately outside the repository that
@@ -43,10 +43,14 @@ VARIANTS = {
 
 
 def _copy_repo(destination: Path) -> None:
-    shutil.copytree(
-        REPO, destination,
-        ignore=shutil.ignore_patterns(".git", "__pycache__", ".pytest_cache", ".json-report.json"),
-    )
+    destination.mkdir()
+    for directory in ("shopcore", "tests"):
+        shutil.copytree(
+            REPO / directory, destination / directory,
+            ignore=shutil.ignore_patterns("__pycache__", ".pytest_cache", ".json-report.json"),
+        )
+    for filename in ("requirements.txt", "pytest.ini"):
+        shutil.copy2(REPO / filename, destination / filename)
 
 
 def _run(repo: Path, target: str | None) -> dict:
