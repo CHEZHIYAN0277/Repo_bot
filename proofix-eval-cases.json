@@ -1,0 +1,33 @@
+{
+  "repository": "proofix-eval-repo",
+  "issues": [
+    {
+      "id": "expired_session",
+      "issue_hint": "An expired account session remains active. Repair the expiry check without rejecting sessions that have not expired.",
+      "target_test": "tests/test_auth.py::test_expired_session_rejected",
+      "expected_behavior": "At now=1700000000, expiry 1699999999 and expiry 1700000000 return False; expiry 1700000001 returns True.",
+      "target_file": "shopcore/auth.py"
+    },
+    {
+      "id": "pagination_off_by_one",
+      "issue_hint": "Catalog pagination skips the first items for a one-based page number. Repair page selection without changing invalid-page handling.",
+      "target_test": "tests/test_pagination.py::test_first_and_second_pages_have_correct_items",
+      "expected_behavior": "For [10,20,30,40,50] and page size 2, page 1 returns [10,20] and page 2 returns [30,40].",
+      "target_file": "shopcore/pagination.py"
+    },
+    {
+      "id": "percentage_discount",
+      "issue_hint": "Checkout subtracts the discount percentage as cents instead of calculating a percentage of the subtotal.",
+      "target_test": "tests/test_pricing.py::test_percentage_discount_uses_subtotal",
+      "expected_behavior": "For a subtotal of 2000 cents, a 25 percent discount returns 1500 cents and a zero percent discount returns 2000 cents.",
+      "target_file": "shopcore/pricing.py"
+    },
+    {
+      "id": "inventory_oversell",
+      "issue_hint": "Stock reservation can return negative inventory when the requested quantity exceeds availability.",
+      "target_test": "tests/test_inventory.py::test_overselling_is_rejected_but_exact_stock_is_allowed",
+      "expected_behavior": "Reserving 4 units from 3 available returns None; reserving exactly 3 from 3 returns 0 remaining.",
+      "target_file": "shopcore/inventory.py"
+    }
+  ]
+}

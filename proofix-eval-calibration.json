@@ -1,0 +1,142 @@
+{
+  "kind": "local_fixture_calibration_not_live_agent_result",
+  "repository": "/Users/chelvachezhiyan/Projects/ProoFix/samples/proofix-eval-repo",
+  "full_original_suite": {
+    "outcome": "behavioral_assertion_failed",
+    "exit_code": 1,
+    "passed": 4,
+    "failed": 4
+  },
+  "cases": [
+    {
+      "case": "expired_session",
+      "target_test": "tests/test_auth.py::test_expired_session_rejected",
+      "acceptance_test_sha256": "ab4d3894cb26729afb909217426caa2a5647cf2de84ada9e9c6d99e97f1ef111",
+      "outcomes": {
+        "original": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "correct": {
+          "outcome": "passed",
+          "exit_code": 0,
+          "passed": 1,
+          "failed": 0
+        },
+        "incorrect": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "unrelated": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        }
+      }
+    },
+    {
+      "case": "pagination_off_by_one",
+      "target_test": "tests/test_pagination.py::test_first_and_second_pages_have_correct_items",
+      "acceptance_test_sha256": "443a3eb6d2f6f509e4c036299017296b3ab6f069d4d926fdb0a426093f115c93",
+      "outcomes": {
+        "original": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "correct": {
+          "outcome": "passed",
+          "exit_code": 0,
+          "passed": 1,
+          "failed": 0
+        },
+        "incorrect": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "unrelated": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        }
+      }
+    },
+    {
+      "case": "percentage_discount",
+      "target_test": "tests/test_pricing.py::test_percentage_discount_uses_subtotal",
+      "acceptance_test_sha256": "73f1deb16955ca7ccdb7b86f5aa38d9a3aa62f8772bbe28b25545a2b1081fa33",
+      "outcomes": {
+        "original": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "correct": {
+          "outcome": "passed",
+          "exit_code": 0,
+          "passed": 1,
+          "failed": 0
+        },
+        "incorrect": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "unrelated": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        }
+      }
+    },
+    {
+      "case": "inventory_oversell",
+      "target_test": "tests/test_inventory.py::test_overselling_is_rejected_but_exact_stock_is_allowed",
+      "acceptance_test_sha256": "b264430f8fcab7b4744a9dfd8c4b2489c15c23e1ab7777bb505b684234c7f250",
+      "outcomes": {
+        "original": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "correct": {
+          "outcome": "passed",
+          "exit_code": 0,
+          "passed": 1,
+          "failed": 0
+        },
+        "incorrect": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        },
+        "unrelated": {
+          "outcome": "behavioral_assertion_failed",
+          "exit_code": 1,
+          "passed": 0,
+          "failed": 1
+        }
+      }
+    }
+  ],
+  "metrics": {
+    "behavioral_original_failures": 4,
+    "correct_fixes_detected": 4,
+    "incorrect_patches_rejected": 4,
+    "unrelated_patches_rejected": 4
+  }
+}
