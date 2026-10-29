@@ -1,0 +1,45 @@
+{
+  "issue_id": "fix-0",
+  "steps": [
+    {
+      "name": "reproduction_before",
+      "command": "python -m pytest tests/test_auth.py::test_expired_session_rejected -v --tb=long",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "cd4d624c81920f2468c88fbaf58340ecedd4fdb5",
+      "expected_result": "exit code 1 (test fails)",
+      "timeout_seconds": 120,
+      "is_targeted": true
+    },
+    {
+      "name": "reproduction_after",
+      "command": "python -m pytest tests/test_auth.py::test_expired_session_rejected -v --tb=long",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "cd4d624c81920f2468c88fbaf58340ecedd4fdb5",
+      "expected_result": "exit code 0 (test passes)",
+      "timeout_seconds": 120,
+      "is_targeted": true
+    },
+    {
+      "name": "mutation_test",
+      "command": "python -m mutmut run && python -m mutmut results --all true",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "cd4d624c81920f2468c88fbaf58340ecedd4fdb5",
+      "expected_result": "exit code 0 (mutants killed)",
+      "timeout_seconds": 60,
+      "is_targeted": true
+    },
+    {
+      "name": "security_delta",
+      "command": "bandit -f json -q -x '.git/*,*/.git/*,.hg/*,*/.hg/*,.mypy_cache/*,*/.mypy_cache/*,.next/*,*/.next/*,.nuxt/*,*/.nuxt/*,.pytest_cache/*,*/.pytest_cache/*,.ruff_cache/*,*/.ruff_cache/*,.svn/*,*/.svn/*,.tox/*,*/.tox/*,.venv/*,*/.venv/*,__pycache__/*,*/__pycache__/*,build/*,*/build/*,coverage/*,*/coverage/*,dist/*,*/dist/*,dist-packages/*,*/dist-packages/*,mutants/*,*/mutants/*,node_modules/*,*/node_modules/*,site-packages/*,*/site-packages/*,target/*,*/target/*,vendor/*,*/vendor/*,venv/*,*/venv/*' -r /tmp/proofix__dorbvlu/shopcore && semgrep --config=auto --json --exclude=.git --exclude=.hg --exclude=.mypy_cache --exclude=.next --exclude=.nuxt --exclude=.pytest_cache --exclude=.ruff_cache --exclude=.svn --exclude=.tox --exclude=.venv --exclude=__pycache__ --exclude=build --exclude=coverage --exclude=dist --exclude=dist-packages --exclude=mutants --exclude=node_modules --exclude=site-packages --exclude=target --exclude=vendor --exclude=venv /tmp/proofix__dorbvlu/shopcore",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "cd4d624c81920f2468c88fbaf58340ecedd4fdb5",
+      "expected_result": "0 new findings vs baseline",
+      "timeout_seconds": 150,
+      "is_targeted": true
+    }
+  ],
+  "bundle_hash": "93952893a6b3dcf241da3658334cf26a798e8beb9954a2ad730e14efa116dbd3",
+  "llm_involved_in_verification": false,
+  "reproduction_confidence": "exact_test",
+  "created_at": "2026-10-29T11:51:38.965834"
+}
