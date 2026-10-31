@@ -1,0 +1,45 @@
+{
+  "issue_id": "fix-0",
+  "steps": [
+    {
+      "name": "reproduction_before",
+      "command": "python -m pytest tests/test_auth.py::test_expired_session_rejected -v --tb=long",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "39f0e57d5c431287f9363ff8643e95a1f24a1426",
+      "expected_result": "exit code 1 (test fails)",
+      "timeout_seconds": 120,
+      "is_targeted": true
+    },
+    {
+      "name": "reproduction_after",
+      "command": "python -m pytest tests/test_auth.py::test_expired_session_rejected -v --tb=long",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "39f0e57d5c431287f9363ff8643e95a1f24a1426",
+      "expected_result": "exit code 0 (test passes)",
+      "timeout_seconds": 120,
+      "is_targeted": true
+    },
+    {
+      "name": "mutation_test",
+      "command": "python -m mutmut run && python -m mutmut results --all true",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "39f0e57d5c431287f9363ff8643e95a1f24a1426",
+      "expected_result": "exit code 0 (mutants killed)",
+      "timeout_seconds": 60,
+      "is_targeted": true
+    },
+    {
+      "name": "security_delta",
+      "command": "bandit -f json -q -x '.git/*,*/.git/*,.hg/*,*/.hg/*,.mypy_cache/*,*/.mypy_cache/*,.next/*,*/.next/*,.nuxt/*,*/.nuxt/*,.pytest_cache/*,*/.pytest_cache/*,.ruff_cache/*,*/.ruff_cache/*,.svn/*,*/.svn/*,.tox/*,*/.tox/*,.venv/*,*/.venv/*,__pycache__/*,*/__pycache__/*,build/*,*/build/*,coverage/*,*/coverage/*,dist/*,*/dist/*,dist-packages/*,*/dist-packages/*,mutants/*,*/mutants/*,node_modules/*,*/node_modules/*,site-packages/*,*/site-packages/*,target/*,*/target/*,vendor/*,*/vendor/*,venv/*,*/venv/*' -r /private/var/folders/7h/kyksq1fn5xzbkgqyk99p89dh0000gn/T/proofix_g07l2j6x/shopcore && semgrep --config=auto --json --exclude=.git --exclude=.hg --exclude=.mypy_cache --exclude=.next --exclude=.nuxt --exclude=.pytest_cache --exclude=.ruff_cache --exclude=.svn --exclude=.tox --exclude=.venv --exclude=__pycache__ --exclude=build --exclude=coverage --exclude=dist --exclude=dist-packages --exclude=mutants --exclude=node_modules --exclude=site-packages --exclude=target --exclude=vendor --exclude=venv /private/var/folders/7h/kyksq1fn5xzbkgqyk99p89dh0000gn/T/proofix_g07l2j6x/shopcore",
+      "base_commit": "633e9ce6ade29d5eed15548895b833503656d4eb",
+      "patch_commit": "39f0e57d5c431287f9363ff8643e95a1f24a1426",
+      "expected_result": "0 new findings vs baseline",
+      "timeout_seconds": 150,
+      "is_targeted": true
+    }
+  ],
+  "bundle_hash": "47ee74baa6484c96405ac8cbfe7c3daa97d828a45846e68498610106dac95227",
+  "llm_involved_in_verification": false,
+  "reproduction_confidence": "exact_test",
+  "created_at": "2026-10-31T12:57:20.382199"
+}
