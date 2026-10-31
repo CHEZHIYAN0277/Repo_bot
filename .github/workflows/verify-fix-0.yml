@@ -67,6 +67,12 @@ jobs:
         if: true
         run: |
           git checkout 39f0e57d5c431287f9363ff8643e95a1f24a1426
+          cat > setup.cfg <<'EOF'
+          [mutmut]
+          source_paths=shopcore/auth.py
+          pytest_add_cli_args_test_selection=tests/test_auth.py::test_expired_session_rejected
+          EOF
+          rm -rf mutants .mutmut-cache
           timeout 60 bash -lc "python -m mutmut run && python -m mutmut results --all true"
 
       - name: Security delta (patch commit)
