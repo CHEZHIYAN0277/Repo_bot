@@ -1,0 +1,106 @@
+name: Verify Proof of Fix (fix-0)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify current head and proof identity
+        env:
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$PR_HEAD"
+          test "$(sha256sum '.proof-of-fix/fix-0.json' | cut -d' ' -f1)" = '5657d39c6ab1bdc5f03d64f6dbe2023ba91a3a2c7bf1053b19d2d25b4bfea6a4'
+          git cat-file -e '0ed649eeb3fedbef8b2092327b6bdb01a7daeda8^{commit}'
+          git merge-base --is-ancestor '0ed649eeb3fedbef8b2092327b6bdb01a7daeda8' "$PR_HEAD"
+          while IFS= read -r changed; do
+            case "$changed" in
+              '.proof-of-fix/fix-0.json'|'.github/workflows/verify-fix-0.yml') ;;
+              *) echo "Source or test changed after tested commit: $changed"; exit 1 ;;
+            esac
+          done < <(git diff --name-only '0ed649eeb3fedbef8b2092327b6bdb01a7daeda8' "$PR_HEAD")
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install verification tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-json-report mutmut bandit semgrep
+
+      - name: Reproduction before (base commit — expect failure)
+        id: repro_before
+        run: |
+          git checkout 633e9ce6ade29d5eed15548895b833503656d4eb
+          set +e
+          timeout 120 bash -lc "python -m pytest tests/test_auth.py::test_expired_session_rejected -v --tb=long"
+          code=$?
+          if [ "$code" -ne 1 ]; then
+            echo "Expected a test failure at base commit 633e9ce6ade2, received exit code $code"
+            exit 1
+          fi
+
+      - name: Reproduction after (patch commit — expect pass)
+        id: repro_after
+        run: |
+          git checkout 0ed649eeb3fedbef8b2092327b6bdb01a7daeda8
+          timeout 120 bash -lc "python -m pytest tests/test_auth.py::test_expired_session_rejected -v --tb=long"
+
+      - name: Mutation test (patch commit)
+        id: mutation
+        if: true
+        run: |
+          git checkout 0ed649eeb3fedbef8b2092327b6bdb01a7daeda8
+          timeout 60 bash -lc "python -m mutmut run && python -m mutmut results --all true"
+
+      - name: Security delta (patch commit)
+        id: security
+        if: true
+        run: |
+          git checkout 0ed649eeb3fedbef8b2092327b6bdb01a7daeda8
+          timeout 150 bash -lc "bandit -f json -q -x '.git/*,*/.git/*,.hg/*,*/.hg/*,.mypy_cache/*,*/.mypy_cache/*,.next/*,*/.next/*,.nuxt/*,*/.nuxt/*,.pytest_cache/*,*/.pytest_cache/*,.ruff_cache/*,*/.ruff_cache/*,.svn/*,*/.svn/*,.tox/*,*/.tox/*,.venv/*,*/.venv/*,__pycache__/*,*/__pycache__/*,build/*,*/build/*,coverage/*,*/coverage/*,dist/*,*/dist/*,dist-packages/*,*/dist-packages/*,mutants/*,*/mutants/*,node_modules/*,*/node_modules/*,site-packages/*,*/site-packages/*,target/*,*/target/*,vendor/*,*/vendor/*,venv/*,*/venv/*' -r /tmp/proofix_uqsj0xzq/shopcore && semgrep --config=auto --json --exclude=.git --exclude=.hg --exclude=.mypy_cache --exclude=.next --exclude=.nuxt --exclude=.pytest_cache --exclude=.ruff_cache --exclude=.svn --exclude=.tox --exclude=.venv --exclude=__pycache__ --exclude=build --exclude=coverage --exclude=dist --exclude=dist-packages --exclude=mutants --exclude=node_modules --exclude=site-packages --exclude=target --exclude=vendor --exclude=venv /tmp/proofix_uqsj0xzq/shopcore"
+
+      - name: Post verification summary
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const body = [
+              '## Proof-of-fix verification (zero LLM calls)',
+              '',
+              'Reproduction mode: **exact failing test**',
+              '',
+              '| Step | Pinned SHA | Expected | Result |',
+              '|------|------------|----------|--------|',
+              '| reproduction_before | `633e9ce6ade2` | exit code 1 (test fails) | ' + '${{ steps.repro_before.outcome }}' + ' |',
+              '| reproduction_after | `0ed649eeb3fe` | exit code 0 (test passes) | ' + '${{ steps.repro_after.outcome }}' + ' |',
+              '| mutation_test | `0ed649eeb3fe` | exit code 0 (mutants killed) | ' + '${{ steps.mutation.outcome }}' + ' |',
+              '| security_delta | `0ed649eeb3fe` | 0 new findings vs baseline | ' + '${{ steps.security.outcome }}' + ' |',
+              '',
+              'Bundle hash: `eac1eb1948be819f51c8ef24d7d2d57199a70bf7e34789ee929671a545bc37e3`',
+              '',
+              'Tested code SHA is an ancestor of the current PR head; source and tests are unchanged since that SHA.',
+            ].join('\n');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body,
+            });
